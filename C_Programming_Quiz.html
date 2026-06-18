@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C Programming — Exam Drill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EAEEF4; --surface:#FFFFFF; --ink:#13202E; --muted:#5C6E80;
+    --line:#D6DEE9; --brand:#1F4E79; --brand2:#2E75B6;
+    --pass:#0E7C86; --pass-bg:#E0F2F1; --fail:#C2410C; --fail-bg:#FCEBDD;
+    --code-bg:#1B2533; --code-ink:#E7EEF6; --code-mut:#7F93A8;
+    --sans:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --disp:"Space Grotesk",var(--sans);
+    --radius:14px; --shadow:0 1px 2px rgba(19,32,46,.06),0 8px 28px rgba(19,32,46,.07);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%,#F2F6FB 0%,transparent 60%),
+      radial-gradient(1000px 500px at -10% 110%,#EAF0F8 0%,transparent 55%),
+      var(--bg);
+    color:var(--ink); font-family:var(--sans);
+    font-size:16px; line-height:1.55; min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:780px; margin:0 auto; padding:28px 20px 80px}
+  .mono{font-family:var(--mono)}
+  button{font-family:inherit}
+  a{color:var(--brand2)}
+
+  /* ---------- header ---------- */
+  .top{display:flex; align-items:center; gap:12px; margin-bottom:22px}
+  .glyph{font-family:var(--mono); font-weight:700; color:#fff; background:var(--brand);
+    width:42px; height:42px; border-radius:11px; display:grid; place-items:center;
+    font-size:20px; box-shadow:var(--shadow); letter-spacing:-1px}
+  .brandname{font-family:var(--disp); font-weight:700; font-size:1.05rem; letter-spacing:.2px}
+  .brandsub{color:var(--muted); font-size:.78rem; font-family:var(--mono); letter-spacing:.5px; text-transform:uppercase}
+
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:26px}
+
+  /* ---------- start ---------- */
+  .hero h1{font-family:var(--disp); font-size:2.2rem; line-height:1.1; margin:.1em 0 .35em; letter-spacing:-.5px}
+  .hero h1 .blink{color:var(--brand2)}
+  .lede{color:var(--muted); font-size:1rem; max-width:54ch}
+  .meta-row{display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 6px}
+  .pill{font-family:var(--mono); font-size:.72rem; letter-spacing:.4px; text-transform:uppercase;
+    color:var(--brand); background:#EAF1F9; border:1px solid #D5E4F3; padding:5px 10px; border-radius:999px}
+  .group-title{font-family:var(--mono); font-size:.72rem; letter-spacing:1px; text-transform:uppercase;
+    color:var(--muted); margin:22px 0 10px}
+  .opts{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{font-family:var(--sans); font-size:.9rem; padding:9px 14px; border-radius:10px; cursor:pointer;
+    background:#fff; border:1px solid var(--line); color:var(--ink); transition:.15s}
+  .chip:hover{border-color:var(--brand2)}
+  .chip.on{background:var(--brand); color:#fff; border-color:var(--brand)}
+  .toggle{display:flex; align-items:center; gap:10px; margin-top:18px; color:var(--muted); font-size:.92rem}
+  .switch{position:relative; width:44px; height:26px; flex:0 0 auto}
+  .switch input{opacity:0; width:0; height:0}
+  .slider{position:absolute; inset:0; background:#C8D3E0; border-radius:999px; transition:.2s}
+  .slider:before{content:""; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.25)}
+  .switch input:checked + .slider{background:var(--brand)}
+  .switch input:checked + .slider:before{transform:translateX(18px)}
+  .cta{display:inline-flex; align-items:center; gap:10px; margin-top:24px;
+    background:var(--brand); color:#fff; border:none; font-weight:600; font-size:1rem;
+    padding:14px 22px; border-radius:12px; cursor:pointer; box-shadow:var(--shadow); transition:.15s}
+  .cta:hover{background:#1a4368; transform:translateY(-1px)}
+  .cta:disabled{opacity:.45; cursor:not-allowed; transform:none}
+  .count-note{font-family:var(--mono); font-size:.8rem; color:var(--muted); margin-top:12px}
+
+  /* ---------- quiz ---------- */
+  .bar-row{display:flex; align-items:center; gap:14px; margin-bottom:16px}
+  .progress{flex:1; height:8px; background:#DCE4EF; border-radius:999px; overflow:hidden}
+  .progress > i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--brand2),var(--brand)); transition:width .35s ease}
+  .progtxt{font-family:var(--mono); font-size:.78rem; color:var(--muted); white-space:nowrap}
+  .qcard{position:relative}
+  .eyebrow{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:14px}
+  .tag{font-family:var(--mono); font-size:.68rem; letter-spacing:.6px; text-transform:uppercase;
+    padding:4px 9px; border-radius:6px; font-weight:600}
+  .tag.ch{color:#fff; background:var(--brand)}
+  .tag.part{color:var(--brand); background:#EAF1F9; border:1px solid #D5E4F3}
+  .qtext{font-size:1.16rem; font-weight:600; line-height:1.4; margin:2px 0 6px}
+  .qhint{color:var(--muted); font-size:.9rem; margin-bottom:6px}
+
+  /* code panel */
+  .ide{background:var(--code-bg); border-radius:12px; overflow:hidden; margin:16px 0 18px; box-shadow:0 6px 18px rgba(19,32,46,.18)}
+  .ide-bar{display:flex; align-items:center; gap:7px; padding:9px 13px; background:#141C28; border-bottom:1px solid #243140}
+  .dot{width:11px; height:11px; border-radius:50%}
+  .d1{background:#FF5F57}.d2{background:#FEBC2E}.d3{background:#28C840}
+  .ide-name{margin-left:8px; font-family:var(--mono); font-size:.74rem; color:var(--code-mut)}
+  .ide-body{padding:14px 8px 14px 0; overflow-x:auto}
+  .ln{display:flex; font-family:var(--mono); font-size:.86rem; line-height:1.65; white-space:pre}
+  .ln .num{width:42px; flex:0 0 42px; text-align:right; padding-right:14px; color:#46566A; user-select:none}
+  .ln .src{color:var(--code-ink)}
+  .ln.cmt .src{color:#6E8AA6; font-style:italic}
+
+  .answers{display:flex; flex-direction:column; gap:10px; margin-top:6px}
+  .ans{display:flex; gap:12px; align-items:flex-start; text-align:left; width:100%;
+    background:#fff; border:1.5px solid var(--line); border-radius:11px; padding:13px 15px;
+    cursor:pointer; font-size:1rem; color:var(--ink); transition:.13s; line-height:1.45}
+  .ans:hover:not(.locked){border-color:var(--brand2); background:#FAFCFF}
+  .ans .key{font-family:var(--mono); font-weight:700; font-size:.82rem; color:var(--muted);
+    border:1px solid var(--line); border-radius:6px; width:24px; height:24px; flex:0 0 24px;
+    display:grid; place-items:center; margin-top:1px}
+  .ans .txt{flex:1}
+  .ans .txt.codey{font-family:var(--mono); font-size:.92em}
+  .ans .txt .codey{font-family:var(--mono); font-size:.94em; background:#F1F4F8; padding:1px 5px; border-radius:5px}
+  .ans.locked{cursor:default}
+  .ans.correct{border-color:var(--pass); background:var(--pass-bg)}
+  .ans.correct .key{background:var(--pass); color:#fff; border-color:var(--pass)}
+  .ans.wrong{border-color:var(--fail); background:var(--fail-bg)}
+  .ans.wrong .key{background:var(--fail); color:#fff; border-color:var(--fail)}
+  .ans.dim{opacity:.55}
+
+  .verdict{display:flex; align-items:center; gap:10px; margin-top:18px; font-family:var(--mono);
+    font-weight:700; font-size:.82rem; letter-spacing:1px; text-transform:uppercase}
+  .verdict.ok{color:var(--pass)} .verdict.no{color:var(--fail)}
+  .vbadge{padding:4px 10px; border-radius:6px; color:#fff}
+  .verdict.ok .vbadge{background:var(--pass)} .verdict.no .vbadge{background:var(--fail)}
+  .explain{margin-top:12px; background:#F6F9FC; border:1px solid var(--line); border-left:4px solid var(--brand2);
+    border-radius:10px; padding:14px 16px; font-size:.95rem; color:#243443}
+  .explain b{color:var(--ink)}
+  .explain code{font-family:var(--mono); font-size:.9em; background:#E9EEF5; padding:1px 5px; border-radius:5px}
+
+  /* flash / self-graded */
+  .reveal-btn{margin-top:6px; background:#EAF1F9; color:var(--brand); border:1px solid #D5E4F3;
+    padding:11px 18px; border-radius:10px; cursor:pointer; font-weight:600; font-size:.95rem}
+  .reveal-btn:hover{background:#dfeaf7}
+  .model{margin-top:14px}
+  .selfgrade{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap}
+  .sg{flex:1; min-width:150px; padding:13px; border-radius:11px; cursor:pointer; font-weight:600; font-size:.95rem; border:1.5px solid; background:#fff}
+  .sg.got{color:var(--pass); border-color:var(--pass)} .sg.got:hover{background:var(--pass-bg)}
+  .sg.rev{color:var(--fail); border-color:var(--fail)} .sg.rev:hover{background:var(--fail-bg)}
+
+  .footrow{display:flex; justify-content:space-between; align-items:center; margin-top:22px; gap:12px}
+  .next{background:var(--brand); color:#fff; border:none; font-weight:600; font-size:1rem;
+    padding:13px 26px; border-radius:11px; cursor:pointer; transition:.15s}
+  .next:hover{background:#1a4368}
+  .next:disabled{opacity:.4; cursor:not-allowed}
+  .ghost{background:none; border:none; color:var(--muted); font-size:.85rem; cursor:pointer; text-decoration:underline}
+  .kbd-hint{font-family:var(--mono); font-size:.72rem; color:var(--muted)}
+  .kbd-hint kbd{background:#fff; border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:1px 6px; font-family:var(--mono)}
+
+  /* ---------- results ---------- */
+  .res-head{text-align:center; padding:8px 0 4px}
+  .res-head .big{font-family:var(--disp); font-size:3.4rem; font-weight:700; line-height:1; letter-spacing:-1px}
+  .res-head .big .slash{color:var(--muted); font-weight:500}
+  .res-sub{font-family:var(--mono); text-transform:uppercase; letter-spacing:1px; font-size:.78rem; color:var(--muted); margin-top:8px}
+  .meter{height:10px; background:#DCE4EF; border-radius:999px; overflow:hidden; margin:18px 0 6px}
+  .meter > i{display:block; height:100%; background:linear-gradient(90deg,var(--pass),var(--brand2))}
+  .runner{margin-top:22px}
+  .runner h3{font-family:var(--mono); font-size:.74rem; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin:0 0 10px}
+  .trow{display:flex; align-items:center; gap:12px; padding:9px 12px; border:1px solid var(--line); border-radius:10px; margin-bottom:7px; background:#fff}
+  .trow .st{font-family:var(--mono); font-weight:700; font-size:.72rem; padding:3px 8px; border-radius:5px; color:#fff; flex:0 0 auto}
+  .st.p{background:var(--pass)} .st.f{background:var(--fail)} .st.r{background:#8492A6}
+  .trow .nm{flex:1; font-size:.92rem}
+  .trow .sc{font-family:var(--mono); font-size:.85rem; color:var(--muted)}
+  .res-actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:24px}
+  .advice{margin-top:18px; background:#F6F9FC; border:1px solid var(--line); border-radius:10px; padding:14px 16px; font-size:.93rem; color:#243443}
+
+  .hide{display:none !important}
+  :focus-visible{outline:3px solid #9CC2EA; outline-offset:2px; border-radius:8px}
+  @media (max-width:560px){
+    .wrap{padding:18px 14px 70px}
+    .card{padding:18px}
+    .hero h1{font-size:1.7rem}
+    .res-head .big{font-size:2.6rem}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="glyph">C;</div>
+    <div>
+      <div class="brandname">Exam Drill</div>
+      <div class="brandsub">C Programming · Ch 1–10</div>
+    </div>
+  </div>
+
+  <!-- ============ START ============ -->
+  <section id="start" class="card hero">
+    <h1>Test yourself before<br>the compiler does<span class="blink">_</span></h1>
+    <p class="lede">Every question here comes from your revision notes — concepts, trace-the-output, and the program-writing patterns. Pick what to drill, or run the full mock.</p>
+
+    <div class="meta-row" id="startPills"></div>
+
+    <div class="group-title">Choose chapters</div>
+    <div class="opts" id="chapterOpts"></div>
+
+    <div class="group-title">Choose exam section</div>
+    <div class="opts" id="partOpts"></div>
+
+    <label class="toggle">
+      <span class="switch"><input type="checkbox" id="shuffleToggle" checked><span class="slider"></span></span>
+      Shuffle the order
+    </label>
+
+    <div><button class="cta" id="startBtn">Start drill →</button></div>
+    <div class="count-note" id="countNote"></div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="quiz" class="hide">
+    <div class="bar-row">
+      <div class="progress"><i id="progFill"></i></div>
+      <div class="progtxt" id="progTxt">0 / 0</div>
+    </div>
+    <div class="card qcard" id="qcard"></div>
+    <div class="footrow">
+      <button class="ghost" id="quitBtn">End &amp; see results</button>
+      <div style="display:flex; align-items:center; gap:14px">
+        <span class="kbd-hint" id="kbdHint"></span>
+        <button class="next" id="nextBtn" disabled>Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="results" class="hide">
+    <div class="card">
+      <div class="res-head">
+        <div class="res-sub">Build report</div>
+        <div class="big"><span id="scoreNum">0</span><span class="slash"> / </span><span id="scoreDen">0</span></div>
+        <div class="res-sub" id="scoreLabel">tests passed</div>
+        <div class="meter"><i id="meterFill"></i></div>
+      </div>
+      <div class="advice" id="advice"></div>
+      <div class="runner">
+        <h3>By chapter</h3>
+        <div id="byChapter"></div>
+      </div>
+      <div class="runner" id="selfWrap">
+        <h3>Self-rated (writing &amp; recall)</h3>
+        <div id="selfRows"></div>
+      </div>
+      <div class="res-actions">
+        <button class="cta" id="restartBtn" style="margin-top:0">Run again</button>
+        <button class="reveal-btn" id="reviewBtn">Review what I missed</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ====================================================================
+   QUESTION BANK  — built from the revision notes (Ch 1–10)
+   type: 'mc'    -> options[], answer index   (concepts, T/F, output)
+         'flash' -> model answer, self graded  (writing & recall)
+   parts: A concepts · B trace · C write
+   ==================================================================== */
+const CH = {1:"Intro",2:"Basics",3:"Input",4:"Selection",5:"Loops",
+            6:"Functions I",7:"Pointers",8:"Arrays",9:"Strings",10:"Files"};
+
+const QUESTIONS = [
+/* ---------- CH1 ---------- */
+{ch:1,part:"A",type:"mc",q:"Which program translates high-level source code into machine code?",
+ options:["compiler","assembler","linker","editor"],answer:0,
+ ex:"A <b>compiler</b> translates high-level source into machine/object code. An <b>assembler</b> only converts assembly language."},
+{ch:1,part:"A",type:"mc",q:"What is an algorithm?",
+ options:["The set of data and instructions used to build a program","A program that translates code","A step-by-step sequence of instructions to solve a problem","The requirements of a program"],answer:2,
+ ex:"An algorithm is a step-by-step sequence describing how data is processed — i.e. the steps to solve a problem."},
+{ch:1,part:"A",type:"mc",q:"In Phase II (Design & Development), what is the SECOND of the four steps?",
+ options:["Analyzing the problem","Developing a solution","Coding the solution","Testing and correcting"],answer:1,
+ ex:"Order is: (1) analyze, (2) develop a solution, (3) code, (4) test & correct. Coding is step 3, not step 2 — a classic trap."},
+{ch:1,part:"A",type:"mc",q:"This snippet is which kind of language?  ADD 1,2 / MUL 2,3 / SUB 4,3",
+ options:["machine language","assembly language","high-level language","none"],answer:1,
+ ex:"Symbolic operation names like ADD/MUL = <b>assembly</b>. Rows of 1s and 0s = machine. <code>int x=5; sum=x+y;</code> = high-level."},
+{ch:1,part:"A",type:"flash",q:"List the three kinds of programming language (by history), and define 'compiler' and 'assembler'.",
+ model:["Three types: machine language, assembly language, high-level language.","",
+        "compiler  — translates high-level source code into machine (object/executable) code.",
+        "assembler — translates assembly-language programs into machine language."]},
+
+/* ---------- CH2 ---------- */
+{ch:2,part:"A",type:"mc",q:"Which has a sizeof value of 8?",
+ options:["char","int","float","double"],answer:3,
+ ex:"Sizes: char=1, int=4, float=4, double=8. Only <code>double</code> is 8 bytes."},
+{ch:2,part:"A",type:"mc",q:"Convert to decimal:  8.123e2",
+ options:["0.08123","81.23","812.3","8123.0"],answer:2,
+ ex:"<code>e2</code> means ×10², so the point moves 2 places right: 8.123 → 812.3."},
+{ch:2,part:"A",type:"mc",q:"Convert to decimal:  7.5e-3",
+ options:["0.0075","0.075","750.0","7500.0"],answer:0,
+ ex:"<code>e-3</code> means ×10⁻³ → move 3 places left: 7.5 → 0.0075."},
+{ch:2,part:"A",type:"mc",q:"Write 0.006789 in exponential notation.",
+ options:["6.789e3","6.789e-3","67.89e-2","0.6789e-2"],answer:1,
+ ex:"Normalize to one digit before the point: 6.789, shifted 3 left → <code>6.789e-3</code>."},
+{ch:2,part:"A",type:"mc",q:"Which is a VALID variable name?",
+ options:["9ab6","c1234","float","sum.of"],answer:1,
+ ex:"Must start with a letter/underscore, contain only letters/digits/underscore, and not be a keyword. <code>9ab6</code> starts with a digit, <code>float</code> is a keyword, <code>sum.of</code> has a dot."},
+{ch:2,part:"A",type:"mc",q:"Which one is NOT a C keyword?",
+ options:["while","switch","For","break"],answer:2,
+ ex:"Keywords are case-sensitive: <code>for</code> is a keyword but <code>For</code> is not — it's a valid identifier."},
+{ch:2,part:"A",type:"flash",q:"State the size in bytes of char, int, float and double, and give the value of sizeof(int a[10]).",
+ model:["char  = 1 byte","int   = 4 bytes","float = 4 bytes","double= 8 bytes","",
+        "sizeof(int a[10]) = 10 × 4 = 40 bytes."]},
+
+/* ---------- OPERATORS (Ch 2–3) ---------- */
+{ch:2,part:"A",type:"mc",q:"Among these, which operator has the HIGHEST precedence?",
+ options:["||","<","*","="],answer:2,
+ ex:"High→low: arithmetic (<code>*</code>) > relational (<code>&lt;</code>) > logical (<code>||</code>) > assignment (<code>=</code>)."},
+{ch:2,part:"A",type:"mc",q:"What is the associativity of the assignment operator = ?",
+ options:["left to right","right to left","no associativity","depends on operands"],answer:1,
+ ex:"Assignment associates <b>right→left</b>, so <code>a=b=c=4</code> assigns 4 to all three."},
+{ch:2,part:"A",type:"mc",q:"The operator  ?:  is referred to as a…",
+ options:["unary operator","binary operator","ternary operator","cast operator"],answer:2,
+ ex:"<code>?:</code> is the only <b>ternary</b> operator (three operands)."},
+{ch:2,part:"B",type:"mc",code:["double r = 10.0 + 15/2 + 2.3;","printf(\"%.1f\\n\", r);"],
+ q:"What is printed?",
+ options:["19.8","19.3","20.0","17.0"],answer:1,
+ ex:"<code>15/2</code> is integer division → 7. So 10.0 + 7 + 2.3 = <b>19.3</b>."},
+{ch:2,part:"B",type:"mc",code:["float a = 7.7, b = -3.5;","float x = (int)a + b;","printf(\"%.1f\\n\", x);"],
+ q:"What is the value of x?",
+ options:["4.2","3.5","4.5","-3.5"],answer:1,
+ ex:"The cast <code>(int)7.7</code> = 7. Then 7 + (−3.5) = <b>3.5</b>."},
+{ch:2,part:"B",type:"mc",code:["/* ASCII: 'a'=97 */","char c = 'm' - 5;","printf(\"%c\\n\", c);"],
+ q:"What character is printed?",
+ options:["'r'","'h'","'i'","'m'"],answer:1,
+ ex:"<code>'m'</code> is 109; 109 − 5 = 104, which is <code>'h'</code>."},
+
+/* ---------- CH3 ---------- */
+{ch:3,part:"A",type:"mc",q:"Which format specifier reads a double with scanf?",
+ options:["%d","%f","%lf","%c"],answer:2,
+ ex:"In scanf, a double uses <code>%lf</code>. (<code>%f</code> reads a float; printf can use %f for both.)"},
+{ch:3,part:"A",type:"mc",q:"You declare  char str[100];  Which reads a word (no spaces) into str?",
+ options:["scanf(\"%c\", str)","scanf(\"%s\", &str)","scanf(\"%s\", str)","puts(str)"],answer:2,
+ ex:"<code>scanf(\"%s\", str)</code> — for %s you pass the array name <i>without</i> &, because the name is already an address."},
+{ch:3,part:"A",type:"mc",q:"You need to read a whole line that may contain spaces. Which works?",
+ options:["scanf(\"%s\", str)","gets(str)","scanf(\"%c\", str)","puts(str)"],answer:1,
+ ex:"<code>scanf(\"%s\")</code> stops at the first space. <code>gets(str)</code> reads the entire line including blanks."},
+
+/* ---------- CH4 ---------- */
+{ch:4,part:"B",type:"mc",code:["char letter = 'm';","if (letter = 'k')","    printf(\"Hello there!\\n\");","else","    printf(\"Hi!\\n\");"],
+ q:"What is printed?",
+ options:["Hi!","Hello there!","nothing","compiler error"],answer:1,
+ ex:"<code>=</code> assigns (sets letter to 'k') and the result 'k' is non-zero → always true, so <b>Hello there!</b>. With <code>==</code> it would print Hi!."},
+{ch:4,part:"A",type:"mc",q:"In a switch statement, what does break do?",
+ options:["ends the program","skips to the next case","prevents fall-through to the following cases","repeats the case"],answer:2,
+ ex:"<code>break</code> exits the switch so execution doesn't fall through into the next case's statements."},
+{ch:4,part:"B",type:"mc",code:["int fun(int x, int y){ return x>y ? x : y; }","printf(\"%d\\n\", fun(0, 8));"],
+ q:"What is printed?",
+ options:["0","8","1","-8"],answer:1,
+ ex:"<code>x>y ? x : y</code> returns the larger of the two → 8."},
+
+/* ---------- CH5 ---------- */
+{ch:5,part:"A",type:"mc",q:"Which loop always executes its body at least once?",
+ options:["while","for","do-while","none of them"],answer:2,
+ ex:"<b>do-while</b> is a posttest loop — the condition is checked after the body, so it runs at least once."},
+{ch:5,part:"A",type:"mc",q:"If a pretest loop's condition is false to begin with, how many times does the body run?",
+ options:["0 times","1 time","infinite","exactly once then stops"],answer:0,
+ ex:"A pretest loop (while/for) checks before the body, so a false start means the body runs <b>0 times</b>."},
+{ch:5,part:"A",type:"mc",q:"What is the difference between break and continue inside a loop?",
+ options:["They are identical","break exits the loop; continue skips to the next iteration","continue exits the loop; break skips an iteration","Both exit the loop"],answer:1,
+ ex:"<code>break</code> terminates the whole loop. <code>continue</code> stops only the current iteration and starts the next."},
+{ch:5,part:"B",type:"mc",code:["int i, total = 1;","for (i = 1; i <= 7; i += 3)","    total = total * i;","printf(\"%d\\n\", total);"],
+ q:"What is printed?",
+ options:["7","28","12","21"],answer:1,
+ ex:"i takes 1, 4, 7. total = 1×1=1, ×4=4, ×7=28 → <b>28</b>."},
+
+/* ---------- CH6 ---------- */
+{ch:6,part:"A",type:"mc",q:"List the storage classes available to LOCAL variables.",
+ options:["auto, extern, static","auto, static, register","extern, static","static, register, global"],answer:1,
+ ex:"Local: <b>auto, static, register</b>. Global: extern, static."},
+{ch:6,part:"A",type:"mc",q:"How does a local static variable differ from a local automatic variable?",
+ options:["static is recreated every call; auto keeps its value","static keeps its value between calls; auto is recreated each call","they behave identically","auto keeps its value; static is global"],answer:1,
+ ex:"A <b>static</b> local is created once and retains its value between calls. An <b>auto</b> local is recreated (reset) on every call."},
+{ch:6,part:"A",type:"mc",q:"A function prototype like  int fact(int);  is placed where, and does what?",
+ options:["Inside main; runs the function","Above main; tells the compiler the return & parameter types","After main only; defines the body","It is optional and ignored"],answer:1,
+ ex:"The prototype goes above main and declares the function's return type and parameter types so it can be called before its definition."},
+{ch:6,part:"B",type:"mc",code:["int init(){","    static int yrs = 1;","    printf(\"%d,\", yrs);","    yrs = yrs + 2;","    return 0;","}","/* main calls init() 4 times */"],
+ q:"What is printed?",
+ options:["1,1,1,1,","1,3,5,7,","0,2,4,6,","3,5,7,9,"],answer:1,
+ ex:"<code>static int yrs=1;</code> runs once; the value persists: 1 → 3 → 5 → 7 → <b>1,3,5,7,</b>"},
+{ch:6,part:"B",type:"mc",code:["int fac(int n){","    static int f = 1;","    f = f * n;","    return f;","}","/* for i=1..5: printf(\"%d \", fac(i)); */"],
+ q:"What is printed?",
+ options:["1 2 3 4 5","1 2 6 24 120","1 1 1 1 1","5 4 3 2 1"],answer:1,
+ ex:"<code>f</code> is static so it accumulates: 1, 1×2=2, ×3=6, ×4=24, ×5=120. (With <code>int f=1;</code> auto it would be 1 2 3 4 5.)"},
+
+/* ---------- CH7 ---------- */
+{ch:7,part:"A",type:"mc",q:"If ptr points to an int, what does  *ptr  mean?",
+ options:["the address of ptr","the value of the variable ptr points to","a multiplication","declares a pointer"],answer:1,
+ ex:"<code>*ptr</code> is the indirection (dereference) operator — the value stored at the address ptr holds."},
+{ch:7,part:"A",type:"mc",q:"If average is a variable, what does  &average  mean?",
+ options:["the value of average","the address of average","a logical AND","a pointer declaration"],answer:1,
+ ex:"<code>&</code> is the address operator: &average = the memory address of the variable average."},
+{ch:7,part:"A",type:"mc",q:"Under pass-by-VALUE, what happens to the caller's variable when the function changes its parameter?",
+ options:["It changes too","It is unaffected — the function got a copy","It becomes undefined","It is passed by address"],answer:1,
+ ex:"By value, the parameter is a copy. Changing it does not affect the caller's variable. To change the caller's variable, pass its address (by reference)."},
+{ch:7,part:"B",type:"mc",code:["void swap(int a, int b){","    int t = a; a = b; b = t;","}","int main(){","    int a=3, b=4;","    swap(a, b);","    printf(\"%d %d\\n\", a, b);","    return 0;","}"],
+ q:"What is printed?",
+ options:["4 3","3 4","4 4","3 3"],answer:1,
+ ex:"This is pass-by-value: swap only changes its local copies, so main's a,b are unchanged → <b>3 4</b>."},
+{ch:7,part:"B",type:"mc",code:["void swap(int *x, int *y){","    int t = *x; *x = *y; *y = t;","}","int main(){","    int a=3, b=4;","    swap(&a, &b);","    printf(\"%d %d\\n\", a, b);","    return 0;","}"],
+ q:"What is printed?",
+ options:["3 4","4 3","4 4","3 3"],answer:1,
+ ex:"Pass-by-reference: addresses are passed and <code>*x</code>/<code>*y</code> modify the caller's variables → <b>4 3</b>."},
+
+/* ---------- CH8 ---------- */
+{ch:8,part:"A",type:"mc",q:"For  int a[6];  what is the valid range of indices?",
+ options:["1 to 6","0 to 6","0 to 5","1 to 5"],answer:2,
+ ex:"Indices start at 0, so a size-6 array uses <code>a[0]</code> … <code>a[5]</code>."},
+{ch:8,part:"A",type:"mc",q:"In a 2-D array, which expression gives the MAIN diagonal element of row i?",
+ options:["a[i][i]","a[i][N-1-i]","a[0][i]","a[i][0]"],answer:0,
+ ex:"Main diagonal: <code>a[i][i]</code>. Secondary diagonal: <code>a[i][N-1-i]</code>."},
+{ch:8,part:"B",type:"mc",code:["int a[4][4]={{5,3,6,2},{3,4,1,0},","            {4,2,1,2},{1,0,0,0}};","int i, sum=0;","for(i=0;i<4;i++)","    sum += a[i][i] + a[i][3-i];","printf(\"%d\\n\", sum);"],
+ q:"What is printed?",
+ options:["14","16","18","20"],answer:1,
+ ex:"i=0: 5+2=7; i=1: 4+1=5 (12); i=2: 1+2=3 (15); i=3: 0+1=1 → <b>16</b>."},
+{ch:8,part:"B",type:"mc",code:["int a[8]={1,2,3,4,5,6,7,8}, i=0, j=7, t;","while(i<j){","    t=a[i]; a[i]=a[j]; a[j]=t;","    i++; j--;","}","for(i=0;i<8;i++) printf(\"%d,\", a[i]);"],
+ q:"What is printed?",
+ options:["1,2,3,4,5,6,7,8,","8,7,6,5,4,3,2,1,","1,2,3,4,4,3,2,1,","8,1,7,2,6,3,5,4,"],answer:1,
+ ex:"Swapping ends inward reverses the array → <b>8,7,6,5,4,3,2,1,</b>"},
+
+/* ---------- CH9 ---------- */
+{ch:9,part:"A",type:"mc",q:"What character terminates every C string?",
+ options:["a space","'\\0' (the null character)","'\\n'","'0' (the digit zero)"],answer:1,
+ ex:"C strings end with the null character <code>'\\0'</code> (value 0), which marks the end of the string."},
+{ch:9,part:"A",type:"mc",q:"How many storage bytes are needed to store the string \"April\"?",
+ options:["4","5","6","7"],answer:2,
+ ex:"5 letters + 1 for the terminating <code>'\\0'</code> = 6. But <code>strlen(\"April\")</code> = 5 (the \\0 isn't counted)."},
+{ch:9,part:"A",type:"mc",q:"True or False:  the string \"april\" is greater than the string \"April\".",
+ options:["True","False"],answer:0,
+ ex:"<b>True.</b> Lowercase letters have larger ASCII codes than uppercase, so at the first char 'a'(97) > 'A'(65)."},
+{ch:9,part:"A",type:"mc",q:"True or False (as strings):  \"17\" is less than \"1234\".",
+ options:["True","False"],answer:1,
+ ex:"<b>False.</b> strcmp compares char-by-char: '1'='1', then '7'(55) vs '2'(50) → '7' > '2', so \"17\" > \"1234\". Length doesn't decide it."},
+{ch:9,part:"A",type:"mc",q:"What does strcmp(s1, s2) return when s1 comes AFTER s2 alphabetically?",
+ options:["a negative value","0","a positive value","the length difference"],answer:2,
+ ex:"strcmp returns <0 if s1<s2, 0 if equal, and <b>>0</b> if s1>s2 (compared by character codes)."},
+{ch:9,part:"B",type:"mc",code:["char str1[10]=\"abcd\", str2[10]=\"efg\";","puts(str1);","puts(str2);"],
+ q:"What is displayed?",
+ options:["abcdefg on one line","abcd then efg on two lines","abcdefg with no newline","efgabcd"],answer:1,
+ ex:"<code>puts()</code> automatically appends a newline, so the two strings print on separate lines."},
+{ch:9,part:"B",type:"mc",code:["/* input typed:  boss boy<Enter> */","char s1[20], s2[20];","scanf(\"%s%s\", s1, s2);","printf(\"%d,%d\\n\", strlen(s1), strlen(s2));","if (strcmp(s1,s2) > 0) printf(\"%s > %s\\n\", s1, s2);","else printf(\"%s < %s\\n\", s1, s2);"],
+ q:"What is printed?",
+ options:["4,3 then boss > boy","4,3 then boss < boy","8 then boss boy","3,3 then boy < boss"],answer:1,
+ ex:"The space splits input: s1=\"boss\"(4), s2=\"boy\"(3). Comparing: 'o'='o', then 's'(115) < 'y'(121) → boss < boy."},
+
+/* ---------- CH10 ---------- */
+{ch:10,part:"A",type:"mc",q:"True or False:  a C source file (e.g. prog.c) is a text file.",
+ options:["True","False"],answer:0,
+ ex:"<b>True.</b> Source files store characters (ASCII) → text files. Executables (.exe) are binary."},
+{ch:10,part:"A",type:"mc",q:"Which function reads data FROM a file?",
+ options:["fopen()","fclose()","fscanf()","fprintf()"],answer:2,
+ ex:"<code>fscanf()</code> reads from a file (like scanf). <code>fprintf()</code> writes to a file."},
+{ch:10,part:"A",type:"mc",q:"In  fopen(\"prices.dat\", \"r\"),  what does the \"r\" mode do?",
+ options:["creates a new file for writing","opens an existing file for reading","appends to the end of the file","reads and writes, erasing contents"],answer:1,
+ ex:"<code>\"r\"</code> opens an existing file for <b>reading</b>; if the file doesn't exist, fopen returns NULL. (\"w\" writes/erases, \"a\" appends.)"},
+{ch:10,part:"A",type:"mc",q:"What does fclose(outFile) do?",
+ options:["deletes the file","breaks the link between the file's internal and external names","opens the file","reads the next line"],answer:1,
+ ex:"<code>fclose()</code> closes the stream — breaking the link between the internal FILE* name and the external filename."},
+{ch:10,part:"A",type:"flash",q:"Name the four file functions and the three text open-modes, and the four steps of working with a file.",
+ model:["Functions: fopen(), fclose(), fscanf(), fprintf().","Modes: \"r\" read, \"w\" write (erases/creates), \"a\" append.","",
+        "Four steps:","1. Declare:  FILE *inFile;","2. Open + check:  inFile = fopen(\"x.txt\",\"r\"); if(inFile==NULL) exit(1);","3. Read/Write:  fscanf(inFile,...) / fprintf(...)","4. Close:  fclose(inFile);"]},
+
+/* ---------- PART C — WRITING (self-graded) ---------- */
+{ch:6,part:"C",type:"flash",q:"WRITE: a function int fact(int n) that returns n!, called from main which inputs n and prints the result.",
+ model:["#include <stdio.h>","int fact(int n);","int main(){","    int n;","    scanf(\"%d\", &n);","    printf(\"The factorial of %d is %d\\n\", n, fact(n));","    return 0;","}","int fact(int n){","    int f=1, i;","    for(i=1;i<=n;i++) f *= i;","    return f;","}"]},
+{ch:8,part:"C",type:"flash",q:"WRITE: initialize grades[10]={1..10}, call double getAvg(double a[], int size) to get the average, print all elements and the average. Use #define SIZE 10.",
+ model:["#include <stdio.h>","#define SIZE 10","double getAvg(double a[], int size);","int main(){","    double grades[SIZE]={1,2,3,4,5,6,7,8,9,10}, avg;","    int i;","    avg = getAvg(grades, SIZE);","    for(i=0;i<SIZE;i++) printf(\"%.2f \", grades[i]);","    printf(\"\\nThe average is %.2f\\n\", avg);","    return 0;","}","double getAvg(double a[], int size){","    double sum=0; int i;","    for(i=0;i<size;i++) sum += a[i];","    return sum/size;","}"]},
+{ch:8,part:"C",type:"flash",q:"WRITE: a program that finds the maximum value in a 2-D array and prints its value, row index and column index.",
+ model:["#include <stdio.h>","#define ROWS 3","#define COLS 4","int main(){","    int a[ROWS][COLS], i, j;","    int max, row=0, col=0;","    for(i=0;i<ROWS;i++)","        for(j=0;j<COLS;j++)","            scanf(\"%d\", &a[i][j]);","    max = a[0][0];","    for(i=0;i<ROWS;i++)","        for(j=0;j<COLS;j++)","            if(a[i][j] > max){ max=a[i][j]; row=i; col=j; }","    printf(\"The maximum value is %d\\n\", max);","    printf(\"Row index is %d and column index is %d\\n\", row, col);","    return 0;","}"]},
+{ch:7,part:"C",type:"flash",q:"WRITE: a function that swaps two ints in the caller using pass-by-reference, called as swap(&a, &b).",
+ model:["#include <stdio.h>","void swap(int *x, int *y){","    int t = *x; *x = *y; *y = t;","}","int main(){","    int a=3, b=4;","    swap(&a, &b);","    printf(\"%d %d\\n\", a, b);   /* 4 3 */","    return 0;","}"]},
+{ch:6,part:"C",type:"flash",q:"WRITE: a function float distance(float,float,float,float) returning the distance between two points, called from main.",
+ model:["#include <stdio.h>","#include <math.h>","float distance(float,float,float,float);","int main(){","    float x1,y1,x2,y2;","    scanf(\"%f%f\", &x1,&y1);","    scanf(\"%f%f\", &x2,&y2);","    printf(\"Distance: %f\\n\", distance(x1,y1,x2,y2));","    return 0;","}","float distance(float x1,float y1,float x2,float y2){","    return sqrt(pow(x2-x1,2) + pow(y2-y1,2));","}"]},
+{ch:5,part:"C",type:"flash",q:"WRITE: a program that computes and prints the sum of all even numbers and the sum of all odd numbers in 1..100.",
+ model:["#include <stdio.h>","int main(){","    int i, sumEven=0, sumOdd=0;","    for(i=1;i<=100;i++)","        if(i%2==0) sumEven += i;","        else       sumOdd  += i;","    printf(\"sumEven=%d, sumOdd=%d\\n\", sumEven, sumOdd);","    return 0;","}"]},
+{ch:9,part:"C",type:"flash",q:"WRITE: a function void reverse(char s[]) that reverses a string in place; main inputs a string and prints the reversed result.",
+ model:["#include <stdio.h>","void reverse(char s[]);","int main(){","    char str[81];","    gets(str);","    reverse(str);","    puts(str);","    return 0;","}","void reverse(char s[]){","    int i=0, j=0; char t;","    while(s[j] != '\\0') j++;","    j--;","    while(i<j){ t=s[i]; s[i]=s[j]; s[j]=t; i++; j--; }","}"]},
+];
+
+/* ====================================================================
+   APP LOGIC
+   ==================================================================== */
+const $ = s => document.querySelector(s);
+const el = (t,c)=>{const e=document.createElement(t); if(c)e.className=c; return e;};
+const looksCode = s => /[()\[\];{}%=]|->|"|'|::|\\0|sizeof|scanf|printf|fopen|strcmp|strlen|int |char |void |float |double /.test(s);
+
+let selectedCh = new Set(Object.keys(CH).map(Number));
+let selectedPart = new Set(["A","B","C"]);
+let pool=[], idx=0, state=[]; // state[i] = {answered, correct, self, q}
+let reviewMode=false;
+
+/* ---- start screen build ---- */
+function buildStart(){
+  const pills=$("#startPills");
+  pills.innerHTML="";
+  const total=QUESTIONS.length;
+  const pA=QUESTIONS.filter(q=>q.part==="A").length;
+  const pB=QUESTIONS.filter(q=>q.part==="B").length;
+  const pC=QUESTIONS.filter(q=>q.part==="C").length;
+  [[total+" questions",""],["A · "+pA+" concept",""],["B · "+pB+" trace",""],["C · "+pC+" write",""]]
+    .forEach(([t])=>{const p=el("span","pill"); p.textContent=t; pills.appendChild(p);});
+
+  const cw=$("#chapterOpts"); cw.innerHTML="";
+  const allCh=el("button","chip on"); allCh.textContent="All chapters"; allCh.dataset.all="ch";
+  cw.appendChild(allCh);
+  Object.entries(CH).forEach(([n,name])=>{
+    const c=el("button","chip on"); c.dataset.ch=n;
+    c.textContent="Ch"+n+" · "+name; cw.appendChild(c);
+  });
+  const pw=$("#partOpts"); pw.innerHTML="";
+  [["A","Concepts (MCQ)"],["B","Trace output"],["C","Write code"]].forEach(([k,label])=>{
+    const c=el("button","chip on"); c.dataset.part=k; c.textContent=label; pw.appendChild(c);
+  });
+
+  cw.onclick=e=>{
+    const b=e.target.closest("button"); if(!b)return;
+    if(b.dataset.all){
+      const turnOn=!b.classList.contains("on");
+      cw.querySelectorAll("button").forEach(x=>x.classList.toggle("on",turnOn));
+      selectedCh = turnOn ? new Set(Object.keys(CH).map(Number)) : new Set();
+    } else {
+      b.classList.toggle("on");
+      const n=Number(b.dataset.ch);
+      b.classList.contains("on")?selectedCh.add(n):selectedCh.delete(n);
+      allCh.classList.toggle("on", selectedCh.size===Object.keys(CH).length);
+    }
+    refreshCount();
+  };
+  pw.onclick=e=>{
+    const b=e.target.closest("button"); if(!b)return;
+    b.classList.toggle("on");
+    const k=b.dataset.part;
+    b.classList.contains("on")?selectedPart.add(k):selectedPart.delete(k);
+    refreshCount();
+  };
+  refreshCount();
+}
+function currentPool(){
+  return QUESTIONS.filter(q=>selectedCh.has(q.ch) && selectedPart.has(q.part));
+}
+function refreshCount(){
+  const n=currentPool().length;
+  $("#countNote").textContent = n+" question"+(n===1?"":"s")+" selected";
+  $("#startBtn").disabled = n===0;
+}
+
+/* ---- start the quiz ---- */
+function start(list){
+  pool=list.slice();
+  if($("#shuffleToggle").checked) shuffle(pool);
+  idx=0;
+  state=pool.map(q=>({q, answered:false, correct:null, self:null}));
+  $("#start").classList.add("hide");
+  $("#results").classList.add("hide");
+  $("#quiz").classList.remove("hide");
+  renderQuestion();
+  window.scrollTo({top:0});
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+
+/* ---- render one question ---- */
+function renderQuestion(){
+  const s=state[idx], q=s.q;
+  const pct=Math.round((idx)/pool.length*100);
+  $("#progFill").style.width=pct+"%";
+  $("#progTxt").textContent=(idx+1)+" / "+pool.length;
+
+  const card=$("#qcard"); card.innerHTML="";
+
+  const eye=el("div","eyebrow");
+  const ch=el("span","tag ch"); ch.textContent="CH"+String(q.ch).padStart(2,"0")+" · "+CH[q.ch].toUpperCase();
+  const partName={A:"CONCEPT",B:"TRACE OUTPUT",C:"WRITE CODE"}[q.part];
+  const pt=el("span","tag part"); pt.textContent="PART "+q.part+" · "+partName;
+  eye.append(ch,pt); card.appendChild(eye);
+
+  const qt=el("div","qtext"); qt.textContent=q.q; card.appendChild(qt);
+
+  if(q.code) card.appendChild(codePanel(q.code, q.part==="C"?"task.c":"trace.c"));
+
+  if(q.type==="mc") renderMC(card,s,q);
+  else renderFlash(card,s,q);
+
+  // footer / next button
+  const nb=$("#nextBtn");
+  nb.textContent = idx===pool.length-1 ? "See results" : "Next";
+  nb.disabled = !s.answered;
+  $("#kbdHint").innerHTML = q.type==="mc"
+    ? '<kbd>1</kbd>–<kbd>'+q.options.length+'</kbd> answer · <kbd>↵</kbd> next'
+    : '<kbd>↵</kbd> reveal / next';
+}
+
+function codePanel(lines, fname){
+  const ide=el("div","ide");
+  const bar=el("div","ide-bar");
+  ["d1","d2","d3"].forEach(d=>{const dot=el("span","dot "+d); bar.appendChild(dot);});
+  const nm=el("span","ide-name"); nm.textContent=fname; bar.appendChild(nm);
+  ide.appendChild(bar);
+  const body=el("div","ide-body");
+  lines.forEach((line,i)=>{
+    const isCmt=/^\s*(\/\/|\/\*|\*)/.test(line);
+    const row=el("div","ln"+(isCmt?" cmt":""));
+    const num=el("span","num"); num.textContent=(i+1);
+    const src=el("span","src"); src.textContent=line.length?line:" ";
+    row.append(num,src); body.appendChild(row);
+  });
+  ide.appendChild(body);
+  return ide;
+}
+
+/* multiple choice */
+function renderMC(card,s,q){
+  const wrap=el("div","answers");
+  q.options.forEach((opt,i)=>{
+    const b=el("button","ans");
+    const k=el("span","key"); k.textContent=String.fromCharCode(65+i);
+    const t=el("span","txt");
+    if(looksCode(opt)) t.classList.add("codey");
+    t.textContent=opt;
+    b.append(k,t);
+    if(s.answered){
+      b.classList.add("locked");
+      if(i===q.answer) b.classList.add("correct");
+      else if(i===s.chosen) b.classList.add("wrong");
+      else b.classList.add("dim");
+    } else {
+      b.onclick=()=>choose(i);
+    }
+    wrap.appendChild(b);
+  });
+  card.appendChild(wrap);
+  if(s.answered) showVerdict(card,s,q);
+}
+function choose(i){
+  const s=state[idx], q=s.q;
+  if(s.answered) return;
+  s.answered=true; s.chosen=i; s.correct = (i===q.answer);
+  renderQuestion();
+  $("#nextBtn").focus();
+}
+function showVerdict(card,s,q){
+  const v=el("div","verdict "+(s.correct?"ok":"no"));
+  const badge=el("span","vbadge"); badge.textContent=s.correct?"PASS":"FAIL";
+  const lbl=el("span"); lbl.textContent=s.correct?"Correct":"Not quite";
+  v.append(badge,lbl); card.appendChild(v);
+  const ex=el("div","explain"); ex.innerHTML=q.ex; card.appendChild(ex);
+}
+
+/* flash / self-graded */
+function renderFlash(card,s,q){
+  if(!s.answered){
+    const btn=el("button","reveal-btn"); btn.textContent="Show model answer";
+    btn.onclick=()=>{ s.revealed=true; renderQuestion(); };
+    card.appendChild(btn);
+    if(s.revealed){
+      card.appendChild(codePanel(q.model, q.part==="C"?"answer.c":"answer.txt"));
+      const sg=el("div","selfgrade");
+      const g=el("button","sg got"); g.textContent="✓ I got it";
+      const r=el("button","sg rev"); r.textContent="✗ Needs review";
+      g.onclick=()=>selfGrade(true); r.onclick=()=>selfGrade(false);
+      sg.append(g,r); card.appendChild(sg);
+    }
+  } else {
+    card.appendChild(codePanel(q.model, q.part==="C"?"answer.c":"answer.txt"));
+    const v=el("div","verdict "+(s.self?"ok":"no"));
+    const badge=el("span","vbadge"); badge.textContent=s.self?"GOT IT":"REVIEW";
+    const lbl=el("span"); lbl.textContent=s.self?"Self-rated: solid":"Self-rated: revisit this";
+    v.append(badge,lbl); card.appendChild(v);
+  }
+}
+function selfGrade(got){
+  const s=state[idx];
+  s.answered=true; s.self=got;
+  renderQuestion();
+  $("#nextBtn").focus();
+}
+
+/* ---- navigation ---- */
+function next(){
+  if(!state[idx].answered) return;
+  if(idx===pool.length-1){ showResults(); return; }
+  idx++; renderQuestion(); window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ---- results ---- */
+function showResults(){
+  $("#quiz").classList.add("hide");
+  $("#results").classList.remove("hide");
+  window.scrollTo({top:0});
+
+  const auto=state.filter(s=>s.q.type==="mc");
+  const flash=state.filter(s=>s.q.type==="flash" && s.answered);
+  const autoCorrect=auto.filter(s=>s.correct).length;
+  const autoTotal=auto.length;
+
+  $("#scoreNum").textContent=autoCorrect;
+  $("#scoreDen").textContent=autoTotal;
+  const pct = autoTotal? Math.round(autoCorrect/autoTotal*100):0;
+  $("#meterFill").style.width=pct+"%";
+  $("#scoreLabel").textContent = autoTotal? ("graded questions · "+pct+"%") : "no graded questions";
+
+  // advice
+  let msg;
+  if(autoTotal===0) msg="You ran a writing/recall-only set — check your self-ratings below and revisit anything marked for review.";
+  else if(pct>=85) msg="Strong. You're exam-ready on most of this — mop up the few misses below and keep the writing patterns warm.";
+  else if(pct>=65) msg="Solid base. Focus your remaining study on the chapters showing the most fails below.";
+  else msg="Good that you're drilling now. Re-read the notes for the weakest chapters below, then run this quiz again.";
+  $("#advice").textContent=msg;
+
+  // by chapter
+  const byCh={};
+  auto.forEach(s=>{const c=s.q.ch; (byCh[c]??=[0,0]); byCh[c][1]++; if(s.correct)byCh[c][0]++;});
+  const bc=$("#byChapter"); bc.innerHTML="";
+  Object.keys(byCh).map(Number).sort((a,b)=>a-b).forEach(c=>{
+    const [ok,tot]=byCh[c];
+    const row=el("div","trow");
+    const st=el("span","st "+(ok===tot?"p":(ok===0?"f":"r")));
+    st.textContent = ok===tot?"PASS":(ok===0?"FAIL":"PART");
+    const nm=el("span","nm"); nm.textContent="Ch"+c+" · "+CH[c];
+    const sc=el("span","sc"); sc.textContent=ok+"/"+tot;
+    row.append(st,nm,sc); bc.appendChild(row);
+  });
+
+  // self-rated
+  const sw=$("#selfWrap"), sr=$("#selfRows"); sr.innerHTML="";
+  if(flash.length===0){ sw.classList.add("hide"); }
+  else{
+    sw.classList.remove("hide");
+    flash.forEach(s=>{
+      const row=el("div","trow");
+      const st=el("span","st "+(s.self?"p":"f")); st.textContent=s.self?"GOT":"REV";
+      const nm=el("span","nm"); nm.textContent="Ch"+s.q.ch+" · "+s.q.q.replace(/^WRITE:\s*/,'').slice(0,58)+"…";
+      row.append(st,nm); sr.appendChild(row);
+    });
+  }
+
+  // review availability
+  const missed = state.filter(s=> (s.q.type==="mc" && s.answered && !s.correct) || (s.q.type==="flash" && s.answered && s.self===false));
+  $("#reviewBtn").style.display = missed.length? "inline-block":"none";
+}
+
+function startReview(){
+  const missed = state.filter(s=> (s.q.type==="mc" && s.answered && !s.correct) || (s.q.type==="flash" && s.answered && s.self===false))
+                      .map(s=>s.q);
+  if(!missed.length) return;
+  reviewMode=true;
+  start(missed);
+}
+
+/* ---- events ---- */
+$("#startBtn").onclick=()=>{ reviewMode=false; start(currentPool()); };
+$("#nextBtn").onclick=next;
+$("#quitBtn").onclick=showResults;
+$("#restartBtn").onclick=()=>{ $("#results").classList.add("hide"); $("#start").classList.remove("hide"); window.scrollTo({top:0}); };
+$("#reviewBtn").onclick=startReview;
+
+document.addEventListener("keydown",e=>{
+  if(!$("#quiz").classList.contains("hide")){
+    const s=state[idx];
+    if(e.key==="Enter"){
+      if(s.q.type==="flash" && !s.revealed && !s.answered){ s.revealed=true; renderQuestion(); e.preventDefault(); return; }
+      if(s.answered){ next(); e.preventDefault(); }
+      return;
+    }
+    if(s.q.type==="mc" && !s.answered){
+      const n=parseInt(e.key,10);
+      if(n>=1 && n<=s.q.options.length){ choose(n-1); e.preventDefault(); }
+    }
+  }
+});
+
+buildStart();
+</script>
+</body>
+</html>
